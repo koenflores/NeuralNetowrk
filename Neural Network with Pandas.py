@@ -10,8 +10,7 @@ Created on Thu Mar 21 17:09:20 2019
 Created on Fri Nov  9 14:50:56 2018
 
 
-THIS NN TEST SUBJECTS 101-110. THESE MODELS HAVE A SCALING OF 1 AND RANDOM 
-MUSCLE STRENGTH
+THIS NN TRAINS ON SUBJECTS 1-80 AND TESTS ON 81-100
 
 @author: koenflores
 """
@@ -52,12 +51,12 @@ class FeedforwardNeuralNetModel(nn.Module):
         #Linear function
         out = self.fc1(x)
         #Non-linearity
-        #out = F.sigmoid(out)
-        out = F.relu6(out)
+        out = F.sigmoid(out)
+        #out = F.relu6(out)
         #linear function (readout)
         out = self.fc2(out)
-        #return F.sigmoid(out)
-        return F.relu6(out)
+        return F.sigmoid(out)
+        #return F.relu6(out)
 ##############################################################################
 
 # %%
@@ -66,9 +65,8 @@ class FeedforwardNeuralNetModel(nn.Module):
 ##############################################################################        
 
 # FILE PARAMETERS
-train_data = pd.read_pickle("D:/Dropbox (UFL)/MBL_Lab/Projects/KFlores/MachineLearning/NeuralNetwork/Subject_Numpy/alltraindata_scale1_pandas_truncated2.pkl")
 train_data = pd.read_pickle("D:/Dropbox (UFL)/MBL_Lab/Projects/KFlores/MachineLearning/NeuralNetwork/Subject_Numpy/alltraindata_1to80_pandas_truncated2.pkl")
-
+#train_data = pd.read_pickle("D:/Dropbox (UFL)/MBL_Lab/Projects/KFlores/MachineLearning/NeuralNetwork/Subject_Numpy/alltraindata_1to80_pandas_truncated.pkl")
 # PARAMETERS FOR TRAINING
 num_subjects   = 100                                         # Number of subjects
 num_train_subj = 80                                          # Number of subjects in training set
@@ -76,7 +74,7 @@ num_epochs     = 200                                        # Number of epochs
 learning_rate  = 1e-3                                       # Learning rate
 batch_size = 100                                            # Batch Size
 features = [6,9,13,16]
-features = list(range(1,48))
+#features = list(range(1,48))
 features = list(range(1,230))
 
 # PARAMETERS FOR THE PROCESSING
@@ -166,9 +164,6 @@ for epoch in range(num_epochs):
         #x_acc1 = 1-np.mean(abs(output_1[0,:]-labels1))
         x_acc1 = 1-np.mean(abs(output_1[0]-labels1.squeeze()))
         
-        if (x_acc1 != 1.0 and epoch == 9 ):
-            print('yes')
-        
         # OPTIMIZE FOR THIS BATCH
         optimizer.zero_grad()                       # Make all the gradients zero first  
         loss.backward()                             # Perform backpropagation
@@ -234,11 +229,12 @@ plt.hold(False)
 ##############################################################################
 print('............Test Neural Network Model With Test Data............')
 
-test_data = pd.read_pickle("D:/Dropbox (UFL)/MBL_Lab/Projects/KFlores/MachineLearning/NeuralNetwork/Subject_Numpy/alltestdata_scale1_pandas_truncated2.pkl")
+#test_data = pd.read_pickle("D:/Dropbox (UFL)/MBL_Lab/Projects/KFlores/MachineLearning/NeuralNetwork/Subject_Numpy/alltestdata_scale1_pandas_truncated2.pkl")
 test_data = pd.read_pickle("D:/Dropbox (UFL)/MBL_Lab/Projects/KFlores/MachineLearning/NeuralNetwork/Subject_Numpy/alltestdata_81to100_pandas_truncated2.pkl")
 test_data = test_data.iloc[:,features_and_labels]
 display_step = len(test_data)/num_test_subj
 total_accuracy = 0
+all_accuracy = 0
 
 for j in range(len(test_data)):
     
@@ -266,6 +262,7 @@ for j in range(len(test_data)):
         #x_acc2 = 1-np.mean(abs(output_2[0,:]-labels2))
         x_acc2 = 1-np.mean(abs(output_2[0]-labels2))
         total_accuracy = total_accuracy + x_acc2
+        all_accuracy = all_accuracy + x_acc2
         
 
         if (j+1)%display_step == 0:
@@ -273,6 +270,9 @@ for j in range(len(test_data)):
             print('step [{}/{}], accuracy:[{:.4f}]'
                   .format(j+1, len(test_data), total_accuracy/display_step))
             total_accuracy = 0
+            
+print('Average Accuracy:[{:.4f}]'
+                 .format(all_accuracy/len(test_data)))
 
 
 
