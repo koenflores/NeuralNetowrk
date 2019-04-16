@@ -36,11 +36,13 @@ from NNDocumention import NNDocumentation
 ##############################################################################
 # BUILD NEURAL NETWORK CLASS
 ##############################################################################
+'''
 class FeedforwardNeuralNetModel(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(FeedforwardNeuralNetModel, self).__init__()
         #Linear function
         self.fc1 = nn.Linear(input_dim, hidden_dim)
+        
         #Non-Linearity
         #Linear function (readout)
         self.fc2 = nn.Linear(hidden_dim, output_dim)
@@ -51,12 +53,32 @@ class FeedforwardNeuralNetModel(nn.Module):
         #Linear function
         out = self.fc1(x)
         #Non-linearity
-        out = F.sigmoid(out)
-        #out = F.relu6(out)
+        #out = F.sigmoid(out)
+        out = F.relu6(out)
         #linear function (readout)
         out = self.fc2(out)
         return F.sigmoid(out)
         #return F.relu6(out)
+'''
+class FeedforwardNeuralNetModel(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(FeedforwardNeuralNetModel, self).__init__()
+        #Linear function
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim2)
+        self.fc3 = nn.Linear(hidden_dim2, output_dim)
+        
+    def forward(self,x): #x is input
+        out = self.fc1(x)
+        #out = F.sigmoid(out)
+        out = F.relu6(out)
+        out = self.fc2(out)
+        #out = F.sigmoid(out)
+        out = F.relu6(out)
+        out = self.fc3(out)
+        return F.sigmoid(out)
+        #return F.relu6(out)
+
 ##############################################################################
 
 # %%
@@ -84,7 +106,8 @@ if_GPU = 0;
 # INSTANTIATE MODEL 
 ##############################################################################
 input_dim  = len(features)                                  # Number of inputs
-hidden_dim = 150                                            # Number of values in hidden layer
+hidden_dim = 25                                           # Number of values in hidden layer
+hidden_dim2 = 25                                           # Number of values in hidden layer
 output_dim = 1                                              # Number of values in output layer
 
 num_in = input_dim                                          # Number of features
@@ -92,7 +115,6 @@ num_out = 1                                                 # Number of outputs
 
 # BUILD MODEL OBJECT
 model = FeedforwardNeuralNetModel(input_dim, output_dim)
-
 # ESTABLISH OPTIMIZATION 
 criterion = nn.MSELoss()    # Mean Squared Error Loss
 optimizer = torch.optim.Adamax(model.parameters(), lr=learning_rate)
