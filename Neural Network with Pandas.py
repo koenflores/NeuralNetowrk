@@ -65,16 +65,23 @@ class FeedforwardNeuralNetModel(nn.Module):
         super(FeedforwardNeuralNetModel, self).__init__()
         #Linear function
         self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc1_drop = nn.Dropout(p=0.5)
+        
         self.fc2 = nn.Linear(hidden_dim, hidden_dim2)
+        self.fc2_drop = nn.Dropout(p=0.5)
+        
         self.fc3 = nn.Linear(hidden_dim2, output_dim)
+        self.fc3_drop = nn.Dropout(p=0.5)
         
     def forward(self,x): #x is input
         out = self.fc1(x)
-        #out = F.sigmoid(out)
         out = F.relu6(out)
+        out = self.fc1_drop(out)
+        
         out = self.fc2(out)
-        #out = F.sigmoid(out)
         out = F.relu6(out)
+        out = self.fc2_drop(out)
+        
         out = self.fc3(out)
         return F.sigmoid(out)
         #return F.relu6(out)
@@ -92,7 +99,7 @@ train_data = pd.read_pickle("D:/Dropbox (UFL)/MBL_Lab/Projects/KFlores/MachineLe
 # PARAMETERS FOR TRAINING
 num_subjects   = 100                                         # Number of subjects
 num_train_subj = 80                                          # Number of subjects in training set
-num_epochs     = 200                                        # Number of epochs
+num_epochs     = 100                                        # Number of epochs
 learning_rate  = 1e-3                                       # Learning rate
 batch_size = 100                                            # Batch Size
 features = [6,9,13,16]
@@ -106,8 +113,8 @@ if_GPU = 0;
 # INSTANTIATE MODEL 
 ##############################################################################
 input_dim  = len(features)                                  # Number of inputs
-hidden_dim = 25                                           # Number of values in hidden layer
-hidden_dim2 = 25                                           # Number of values in hidden layer
+hidden_dim = 100                                           # Number of values in hidden layer
+hidden_dim2 = 100                                           # Number of values in hidden layer
 output_dim = 1                                              # Number of values in output layer
 
 num_in = input_dim                                          # Number of features
